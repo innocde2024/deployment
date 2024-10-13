@@ -4,12 +4,16 @@ services:
   auth-service:
     build: .
     restart: unless-stopped
+    ports:
+      - "8080:8080"
     volumes:
       - auth-data:/app/data 
 
   shop-service:
     build: .
     restart: unless-stopped
+    ports:
+      - "8081:8081"
     volumes:
       - shop-data:/app/data 
 
