@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - auth-data:/app/data 
+
+  shop-service:
+    build: .
+    restart: unless-stopped
+    volumes:
+      - shop-data:/app/data 
+
+  forum-service:
+    build: .
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      - PORT=${PORT}
+      - HOST=${HOST}
+      - DB_URI=${DB_URI}
+      - NODE_ENV=${NODE_ENV}
+      - CONTEXT_PATH=${CONTEXT_PATH}
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_URI=${CLIENT_URI}
+    volumes:
+      - forum-data:/app/data 
+
+  stripe-cli:
+    image: stripe/stripe-cli
+    container_name: stripe-cli
+    command: "listen --api-key ${STRIPE_SECRET_KEY} --forward-to host.docker.internal:4000/webhook"
+    env_file: ./.env
+    stdin_open: true
+    tty: true
+    volumes:
+      - stripe-cli-data:/root/.config/stripe  
+
+volumes:
+  auth-data:
+  shop-data:
+  forum-data:
+  stripe-cli-data:
